@@ -1,0 +1,28 @@
+import wixData from 'wix-data'
+
+export async function getBrand() {
+  try {
+    const response = await wixData.query("VehicleInfo").ascending('brand').distinct("brand");
+    return response
+  } catch(error) {
+    throw new Error('Araba bilgisi alinirken bir hata olustu', error.message)
+  }
+}
+
+export async function getModel(brand) {
+  try {
+    const response = await wixData.query("VehicleInfo").eq("brand", brand).ascending('model').find();
+    return response
+  } catch(error) {
+    throw new Error('Araba modeli alinirken bir hata olustu', error.message)
+  }
+}
+
+export async function getYearList() {
+  try {
+    const response = await wixData.query('araba').descending("aracyili").distinct("aracyili")
+    return response
+  } catch(error) {
+    throw new Error('Arac yili', error.message)
+  }
+}

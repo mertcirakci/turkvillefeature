@@ -1,0 +1,45 @@
+// Get services on Homepage
+import wixData from 'wix-data'
+import { services } from 'wix-bookings.v2';
+
+function filterAddsOnly(items) {
+  return items.filter(item => item.extendedFields?.namespaces?._user_fields?.reklam)
+}
+
+
+/**
+ * Asynchronously fetches services from the 'services' collection.
+ * The query fetches all services and then filters them to return only those with advertisements.
+ * If there's an error during the fetch, it throws an error with a message.
+ *
+ * @returns {Promise<Array>} A promise that resolves to an array of services with advertisements.
+ * @throws {Error} If there's an error during the fetch, it throws an error with a message.
+ */
+
+export async function getServices() {
+  try {
+      const data = await services.queryServices().find();
+      return filterAddsOnly(data.items);
+  } catch(error) {
+      throw new Error('Servisler cekilirken bir hata olustu.')
+  }
+}
+
+
+
+/**
+ * Asynchronously fetches advertisements from the 'araba' collection.
+ * The query is limited to the first 4 items found in the collection.
+ * If there's an error during the fetch, it throws an error with a message.
+ *
+ * @returns {Promise<Array>} A promise that resolves to an array of the first 4 items in the 'araba' collection.
+ * @throws {Error} If there's an error during the fetch, it throws an error with a message.
+ */
+export async function getAdverts() {
+  try {
+    const data = await wixData.query('araba').limit(4).find();
+    return data
+  } catch(error) {
+    throw new Error('Servisler cekilirken bir hata olustu.')
+  }
+}

@@ -1,0 +1,23 @@
+import {members} from 'wix-members-backend'
+// import wixChatBackend from 'wix-chat-backend'
+
+
+export async function getMemberDetails(memberId) {
+    try {
+        const member = await members.getMemberDetails(memberId);
+        return member;
+    } catch (error) {
+        console.error("Uye bilgileri alinamadi", error);
+
+    }
+}
+
+// export async function startChat (memberId, messageText) {
+//     try {
+//         const member = await getMemberDetails(memberId);
+//         const channelId = member.contactDetails.email;
+//         await wixChatBackend.sendMessage
+//     } catch(error) {
+//         console.error("Uyeler yuklenirken bir hata olustu")
+//     }
+// }

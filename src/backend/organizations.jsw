@@ -1,0 +1,89 @@
+import wixData from 'wix-data';
+
+export async function getCategories() {
+  try {
+    const response = await wixData.query('Categories').descending('_id').find();
+    return response;
+  } catch (error) {
+    throw new Error('Kategoriler alinirken bir hata olustu', error.message);
+  }
+}
+
+export async function getSubcategories(categoryId) {
+  try {
+    const response = await wixData
+      .query('Subcategories')
+      .descending('_id')
+      .eq('categoryId', categoryId)
+      .find();
+    return response;
+  } catch (error) {
+    throw new Error('Alt kategoriler getirilirken bir hata olustu', error.message);
+  }
+}
+
+export async function getOrganizationsData(subCategoryIds = [], city = null, state = null) {
+  console.log('subCategoryIds', subCategoryIds, 'state', state, 'city', city);
+  try {
+    let organizationsQuery = wixData.query('Organizations');
+    if (subCategoryIds.length > 0) {
+      organizationsQuery = organizationsQuery.hasSome('subCategoryId', subCategoryIds);
+    }
+
+    if (city && city !== 'all') {
+      organizationsQuery = organizationsQuery.eq('city', city);
+    }
+
+    if (state && state !== 'all') {
+      organizationsQuery = organizationsQuery.eq('state', state);
+    }
+    try {
+      const [organizations, cities, states] = await Promise.all([
+        organizationsQuery.find(),
+        wixData.query('Organizations').distinct('city'),
+        wixData.query('Organizations').distinct('state'),
+      ]);
+      console.log('organizations', organizations.query);
+      return {
+        organizations: organizations.items,
+        cities,
+        states,
+      };
+    } catch (err) {
+      console.log('errorrrrr', err);
+    }
+  } catch (error) {
+    throw new Error('Veriler getirilirken bir hata olustu', error.message);
+  }
+}
+
+// export async function getOrganizations(subCategoryIds) {
+//   try {
+//     const response = await wixData.query("Organizations")
+//     .hasSome('subCategoryId', subCategoryIds)
+//     .find();
+
+//     return response
+//   } catch(error) {
+//     throw new Error('Isletmeler getirilirken bir hata olustu', error.message)
+//   }
+// }
+
+export async function getCities() {
+  try {
+    // const response = await wixData.query("Cities").ascending('city_ascii').eq('province_id', province_id).limit(10).find()
+    const response = await wixData.query('Organizations').distinct('city');
+    return response;
+  } catch (error) {
+    throw new Error('Sehir getirilirken bir hata olustu', error);
+  }
+}
+
+export async function getStates() {
+  try {
+    const response = await wixData.query('Organizations').distinct('state');
+    return response;
+  } catch (error) {
+    throw new Error('Eyaletler getirilirken bir hata olustu', error);
+  }
+}
